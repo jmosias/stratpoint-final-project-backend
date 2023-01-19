@@ -6,7 +6,7 @@ exports.createBlog = async (req, res, next) => {
     const blog = await Blog.create(req.body);
     res.status(201).json(blog);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
@@ -16,7 +16,7 @@ exports.getAllBlogs = async (req, res, next) => {
     const blogs = await Blog.find();
     res.status(200).json(blogs);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
@@ -27,12 +27,14 @@ exports.getBlog = async (req, res, next) => {
     const blog = await Blog.findById(id);
 
     if (!blog) {
-      return res.status(404).json({ message: `No blog with id: ${id}` });
+      const error = new Error(`No blog with id: ${id}`);
+      error.statusCode = 404;
+      next(error);
     } else {
       res.status(200).json(blog);
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
@@ -47,10 +49,12 @@ exports.editBlog = async (req, res, next) => {
     res.status(200).json(blog);
 
     if (!blog) {
-      return res.status(404).json({ message: `No blog with id: ${id}` });
+      const error = new Error(`No blog with id: ${id}`);
+      error.statusCode = 404;
+      next(error);
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
@@ -65,10 +69,12 @@ exports.patchBlog = async (req, res, next) => {
     res.status(200).json(blog);
 
     if (!blog) {
-      return res.status(404).json({ message: `No blog with id: ${id}` });
+      const error = new Error(`No blog with id: ${id}`);
+      error.statusCode = 404;
+      next(error);
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
@@ -84,6 +90,6 @@ exports.deleteBlog = async (req, res, next) => {
       res.status(200).json({ message: `"${blog.title}" has been deleted` });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };

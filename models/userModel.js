@@ -24,7 +24,7 @@ const userSchema = mongoose.Schema(
     },
     profile_picture_url: {
       type: String,
-      dafult: "empty.jpeg",
+      required: true,
     },
     password_chances: {
       type: Number,
