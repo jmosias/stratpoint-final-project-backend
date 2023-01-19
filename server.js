@@ -39,6 +39,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage, fileFilter }).single("profile_picture"));
 app.use("/images", express.static("images"));
+app.use(express.static("images"));
 
 // Routes
 app.use("/users", userRoutes);

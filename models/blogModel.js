@@ -15,7 +15,8 @@ const blogSchema = mongoose.Schema(
       required: true,
     },
     user_id: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     is_draft: {
