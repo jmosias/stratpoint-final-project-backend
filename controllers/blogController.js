@@ -4,7 +4,11 @@ const Blog = require("../models/blogModel");
 // POST /blogs
 exports.createBlog = async (req, res, next) => {
   try {
-    const data = { ...req.body, user_id: req.userId, is_draft: false };
+    const data = {
+      ...req.body,
+      user_id: req.userId,
+      is_draft: false,
+    };
     const blog = await Blog.create(data);
     res.status(201).json(blog);
   } catch (error) {
@@ -27,6 +31,7 @@ exports.getBlogsByUser = async (req, res, next) => {
     const { id } = req.params;
     const blogs = await Blog.find({
       user_id: { $in: [Types.ObjectId(id)] },
+      deleted_at: { $in: [null] },
     });
     if (!blogs) {
       const error = new Error(`No blogs found from user id: ${id}`);
@@ -82,7 +87,14 @@ exports.editBlog = async (req, res, next) => {
 exports.patchBlog = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const blog = await Blog.findByIdAndUpdate({ _id: id }, req.body, {
+    let updatedData = req.body;
+    if (req.file) {
+      updatedData = {
+        ...req.body,
+        cover_picture_url: req.file.path,
+      };
+    }
+    const blog = await Blog.findByIdAndUpdate({ _id: id }, updatedData, {
       new: true,
       runValidators: true,
     });
@@ -98,16 +110,24 @@ exports.patchBlog = async (req, res, next) => {
   }
 };
 
-// DELETE /blogs/:id
-exports.deleteBlog = async (req, res, next) => {
+// PATCH /blogs/delete/:id
+exports.softDeleteBlog = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const blog = await Blog.findByIdAndDelete(id);
+    const blog = await Blog.findByIdAndUpdate(
+      { _id: id },
+      { deleted_at: new Date() },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    res.status(200).json(blog);
 
     if (!blog) {
-      return res.status(404).json({ message: `No blog with id: ${id}` });
-    } else {
-      res.status(200).json({ message: `"${blog.title}" has been deleted` });
+      const error = new Error(`No blog with id: ${id}`);
+      error.statusCode = 404;
+      next(error);
     }
   } catch (error) {
     next(error);

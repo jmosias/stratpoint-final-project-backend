@@ -20,6 +20,15 @@ const fileStorage = multer.diskStorage({
   },
 });
 
+const coverStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./images/blogs");
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+
 const fileFilter = (req, file, cb) => {
   if (
     file.mimetype === "image/png" ||
@@ -38,6 +47,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage, fileFilter }).single("profile_picture"));
+app.use(multer({ storage: coverStorage, fileFilter }).single("cover_picture"));
 app.use("/images", express.static("images"));
 app.use(express.static("images"));
 

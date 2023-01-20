@@ -4,8 +4,9 @@ const {
   createBlog,
   getBlog,
   editBlog,
-  deleteBlog,
+  softDeleteBlog,
   getBlogsByUser,
+  patchBlog,
 } = require("../controllers/blogController");
 const isAuth = require("../middleware/isAuth");
 
@@ -18,6 +19,7 @@ router.get("/user/:id", getBlogsByUser);
 
 router.post("/", isAuth, createBlog);
 router.put("/:id", isAuth, editBlog);
-router.delete("/:id", isAuth, deleteBlog);
+router.patch("/delete/:id", isAuth, softDeleteBlog);
+router.patch("/update/:id", isAuth, patchBlog);
 
 module.exports = router;
