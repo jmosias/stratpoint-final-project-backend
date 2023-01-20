@@ -107,3 +107,29 @@ exports.getUser = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.updateUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    let updatedData = req.body;
+    if (req.file) {
+      updatedData = {
+        ...req.body,
+        profile_picture_url: req.file.path,
+      };
+    }
+    const user = await User.findByIdAndUpdate({ _id: id }, updatedData, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json(user);
+
+    if (!user) {
+      const error = new Error(`No user with id: ${id}`);
+      error.statusCode = 404;
+      next(error);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
