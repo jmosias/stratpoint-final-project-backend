@@ -7,14 +7,15 @@ const MAX_PASSWORD = 72;
 const MIN_USERNAME = 6;
 const MAX_USERNAME = 18;
 
-const signupValidator = [
+const updateUserValidator = [
   body("email")
     .isEmail()
     .withMessage("Please enter a valid email.")
     .custom((value, { req }) => {
       return User.findOne({ email: value }).then((userDoc) => {
         if (userDoc) {
-          return Promise.reject("Email address already exists");
+          if (userDoc._id.toString() !== req.userId)
+            return Promise.reject("This email is already in used");
         }
       });
     })
@@ -28,7 +29,8 @@ const signupValidator = [
     .custom((value, { req }) => {
       return User.findOne({ username: value }).then((userDoc) => {
         if (userDoc) {
-          return Promise.reject("Username already exists");
+          if (userDoc._id.toString() !== req.userId)
+            return Promise.reject("This username is already in used");
         }
       });
     })
@@ -40,4 +42,4 @@ const signupValidator = [
   body("last_name").trim().not().isEmpty(),
 ];
 
-module.exports = signupValidator;
+module.exports = updateUserValidator;
