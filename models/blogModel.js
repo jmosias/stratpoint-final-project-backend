@@ -25,7 +25,7 @@ const blogSchema = mongoose.Schema(
     },
     deleted_at: {
       type: String,
-      default: "",
+      required: false,
     },
   },
   { timestamps: true }

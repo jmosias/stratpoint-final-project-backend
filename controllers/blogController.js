@@ -3,11 +3,15 @@ const Blog = require("../models/blogModel");
 
 // POST /blogs
 exports.createBlog = async (req, res, next) => {
+  let imagePath = "images/no-image.webp";
+  if (req.file) imagePath = req.file.path;
+
   try {
     const data = {
       ...req.body,
       user_id: req.userId,
       is_draft: false,
+      cover_picture_url: imagePath,
     };
     const blog = await Blog.create(data);
     res.status(201).json(blog);
