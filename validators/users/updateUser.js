@@ -2,8 +2,6 @@ const { body } = require("express-validator");
 
 const User = require("../../models/userModel");
 
-const MIN_PASSWORD = 6;
-const MAX_PASSWORD = 72;
 const MIN_USERNAME = 6;
 const MAX_USERNAME = 18;
 
@@ -20,10 +18,6 @@ const updateUserValidator = [
       });
     })
     .normalizeEmail(),
-  body("password")
-    .trim()
-    .isLength({ min: MIN_PASSWORD, max: MAX_PASSWORD })
-    .withMessage(`Please enter ${MIN_PASSWORD} - ${MAX_PASSWORD} characters`),
   body("username")
     .trim()
     .custom((value, { req }) => {

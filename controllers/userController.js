@@ -120,7 +120,7 @@ exports.updateUser = async (req, res, next) => {
   }
 
   try {
-    const { id } = req.params;
+    const id = req.userId;
     let updatedData = req.body;
     if (req.file) {
       updatedData = {
@@ -139,6 +139,51 @@ exports.updateUser = async (req, res, next) => {
       error.statusCode = 404;
       next(error);
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updatePassword = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error("Validation failed.");
+    error.statusCode = 422;
+    error.data = errors.array();
+    next(error);
+    return;
+  }
+
+  try {
+    const id = req.userId;
+    let user = await User.findById(id);
+
+    bcrypt
+      .compare(req.body.old_password, user.password)
+      .then(async (isEqual) => {
+        if (!isEqual) {
+          const error = new Error("Wrong password");
+          error.formType = "old_password";
+          error.statusCode = 401;
+          next(error);
+        } else {
+          const updatedData = {
+            ...user,
+            password: req.body.new_password,
+          };
+          user = await User.findByIdAndUpdate({ _id: id }, updatedData, {
+            new: true,
+            runValidators: true,
+          });
+          res.status(200).json(user);
+
+          if (!user) {
+            const error = new Error(`No user with id: ${id}`);
+            error.statusCode = 404;
+            next(error);
+          }
+        }
+      });
   } catch (error) {
     next(error);
   }

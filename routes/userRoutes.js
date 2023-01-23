@@ -5,9 +5,11 @@ const {
   login,
   getUser,
   updateUser,
+  updatePassword,
 } = require("../controllers/userController");
 const isAuth = require("../middleware/isAuth");
 const signupValidator = require("../validators/users/signup");
+const passwordValidator = require("../validators/users/updatePassword");
 const updateUserValidator = require("../validators/users/updateUser");
 
 const router = express.Router();
@@ -16,10 +18,7 @@ const router = express.Router();
 router.post("/signup", signupValidator, signup);
 router.post("/login", login);
 router.get("/:id", getUser);
-router.patch("/update/:id", [isAuth, updateUserValidator], updateUser);
-
-// router.get("/");
-// router.put("/:id");
-// router.delete("/:id");
+router.patch("/update", [isAuth, updateUserValidator], updateUser);
+router.patch("/update_password", [isAuth, passwordValidator], updatePassword);
 
 module.exports = router;
